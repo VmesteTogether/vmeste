@@ -29,8 +29,7 @@
   background: radial-gradient(120% 90% at 50% 40%,
     rgba(5, 13, 11, 0.10) 0%, rgba(5, 13, 11, 0.62) 55%, rgba(5, 13, 11, 0.90) 100%);
 }
-.vs-bar, .vs-shell, .vs-foot { position: relative; z-index: 5; }
-.vs-bar { background: rgba(0, 51, 50, 0.82); backdrop-filter: blur(6px); }
+.vs-shell { position: relative; z-index: 5; }
 
 .vz-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
@@ -71,32 +70,22 @@
 .vz-count b { color: var(--acid); font-weight: 700; }
 </style>
 </head>
-<body>
+<body class="has-orb">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- the way back to the index -->
+<a class="orb-home" href="../index.html" data-hue="#7CFF4D"
+   style="--hue:#7CFF4D" aria-label="VmesteSoft — all tools">
+  <canvas aria-hidden="true"></canvas>
+</a>
+
 
 <canvas id="stage" aria-hidden="true"></canvas>
 <div id="veil" aria-hidden="true"></div>
 
-<a class="skip-link" href="#main">Skip to content</a>
-<nav class="vs-bar" aria-label="VmesteSoft tools">
-  <a class="vs-mark" href="../index.html">Vmeste<b>Soft</b></a>
-  <div class="vs-tabs">
-    <a class="vs-tab" href="../index.html"><i>00</i>Index</a>
-    <a class="vs-tab" href="../compressor/index.html"><i>01</i>Compress</a>
-    <a class="vs-tab" href="../formatter/index.html"><i>02</i>Format</a>
-    <a class="vs-tab" href="../merger/index.html"><i>03</i>Merge</a>
-    <a class="vs-tab" href="../qr/index.html"><i>04</i>QR</a>
-    <a class="vs-tab" aria-current="page" href="../vmestenizer/index.html"><i>05</i>Vmestenize</a>
-    <a class="vs-tab" href="../haiku/index.html"><i>06</i>Haiku</a>
-  </div>
-</nav>
 
 <main class="vs-shell" id="main">
-
-  <header class="vs-head">
-    <div class="vs-eyebrow"><b>05</b> / Vmestenize</div>
-    <h1>Vmestenizer</h1>
-    <div class="vs-rule"></div>
-  </header>
+<h1 class="sr-only">Vmestenizer</h1>
 
   <div class="vz-grid">
     <section class="vz-pane">
@@ -326,5 +315,6 @@ document.getElementById('copy').addEventListener('click', async (e) => {
 });
 </script>
 
+<script src="../orbhome.js"></script>
 </body>
 </html>

@@ -121,103 +121,46 @@ body {
 :focus-visible { outline: 1px solid var(--acid); outline-offset: 2px; }
 
 /* ════════════════════════════════════════════════════════════════
-   TAB BAR
+   HOME ORB — the only chrome on a tool page
+
+   A tool page has no bar and no title block. The way back to the
+   index is the same distorted sphere the index draws, at corner
+   size, in that tool's own hue. It is the one element on a tool
+   page that carries a hue other than --acid.
    ════════════════════════════════════════════════════════════════ */
 
-.vs-bar {
-  position: sticky; top: 0; z-index: 100;
-  display: flex; align-items: stretch; gap: var(--gutter);
-  min-height: var(--bar-h);
-  padding: 0 var(--gutter);
-  background: var(--house);
-  border-bottom: 1px solid var(--line);
+.orb-home {
+  /* Hung over the corner, not placed inside it: the viewport edge crops a
+     slice off the sphere, so it reads as something drifting in from outside
+     the page. The box never changes size — growing it would re-quantise the
+     character grid and the swell would come out stepped. The sphere itself
+     eases, in the renderer. */
+  position: fixed; top: -46px; left: -46px; z-index: 200;
+  display: block; width: 176px; height: 176px;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
+.orb-home canvas { display: block; width: 100%; height: 100%; }
 
-.vs-mark {
-  display: flex; align-items: center; flex-shrink: 0;
-  font-family: var(--shout); font-weight: 800; font-size: 19px;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--bone); text-decoration: none;
-  white-space: nowrap;
-}
-.vs-mark b { color: var(--acid); font-weight: 800; }
-.vs-mark:hover { color: var(--bone); }
-
-.vs-tabs {
-  display: flex; align-items: stretch; gap: 0;
-  overflow-x: auto; overflow-y: hidden;
-  scrollbar-width: none; -ms-overflow-style: none;
-}
-.vs-tabs::-webkit-scrollbar { display: none; }
-
-.vs-tab {
-  display: flex; align-items: center; gap: 7px;
-  padding: 0 14px;
-  font-family: var(--mono); font-size: var(--t-label); font-weight: 700;
+.orb-home::after {
+  content: 'All tools';
+  position: absolute; right: 6px; bottom: 8px;
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
   letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ash); text-decoration: none; white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  transition: color 100ms linear, background 100ms linear;
+  color: var(--hue, var(--acid)); white-space: nowrap;
+  opacity: 0; transition: opacity 260ms ease; pointer-events: none;
 }
-.vs-tab i { font-style: normal; color: var(--ghost); transition: color 100ms linear; }
-.vs-tab:hover { color: var(--bone); }
-.vs-tab:hover i { color: var(--ash); }
-.vs-tab[aria-current="page"] {
-  color: var(--acid);
-  background: var(--acid-ghost);
-  border-bottom-color: var(--acid);
-}
-.vs-tab[aria-current="page"] i { color: var(--acid-dim); }
+.orb-home:hover::after, .orb-home:focus-visible::after { opacity: 1; }
+.orb-home:focus-visible { outline: none; }
 
-/* ════════════════════════════════════════════════════════════════
-   PAGE HEAD / SHELL / FOOT
-   ════════════════════════════════════════════════════════════════ */
+/* Every tool page starts below the orb at its fullest. This lives on <body>
+   because each tool's skin sets a `padding` shorthand on its own main
+   element, which would reset a padding-top set there. */
+body.has-orb { padding-top: 148px; }
 
-.vs-shell {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 40px var(--gutter) 80px;
-}
-
-.vs-head { margin-bottom: 32px; }
-
-.vs-eyebrow {
-  font-family: var(--mono); font-size: var(--t-label); font-weight: 700;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ghost);
-  margin-bottom: 10px;
-}
-.vs-eyebrow b { color: var(--acid); font-weight: 700; }
-
-.vs-head h1 {
-  font-family: var(--shout); font-weight: 800;
-  font-size: var(--t-display); line-height: 1.1;
-  letter-spacing: 0.02em; text-transform: uppercase;
-  color: var(--bone);
-}
-
-.vs-lede {
-  margin-top: 8px;
-  color: var(--ash);
-  max-width: 62ch;
-}
-
-.vs-rule { height: 1px; background: var(--line); margin-top: 24px; }
-
-.vs-foot {
-  border-top: 1px solid var(--line);
-  padding: 20px var(--gutter);
-  font-family: var(--mono); font-size: var(--t-micro); font-weight: 700;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ghost);
-  text-align: center;
-}
-
-h2 {
-  font-family: var(--shout); font-weight: 800;
-  font-size: var(--t-title); line-height: 1.1;
-  letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--bone);
+@media (max-width: 860px) {
+  .orb-home { width: 128px; height: 128px; top: -34px; left: -34px; }
+  body.has-orb { padding-top: 108px; }
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -459,9 +402,6 @@ h2 {
 
 @media (max-width: 860px) {
   :root { --gutter: 16px; --t-display: 32px; --t-title: 20px; }
-  .vs-bar { gap: 12px; }
-  .vs-mark { font-size: 16px; }
-  .vs-tab { padding: 0 10px; }
   .vs-shell { padding: 28px var(--gutter) 64px; }
 }
 

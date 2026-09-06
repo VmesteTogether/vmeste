@@ -20,7 +20,7 @@
 
 <style>
 #drift { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-.vs-bar, .vs-shell, .vs-foot { position: relative; z-index: 5; }
+.vs-shell { position: relative; z-index: 5; }
 
 .hk-stage {
   border: 1px solid var(--line);
@@ -62,31 +62,21 @@
 
 </style>
 </head>
-<body>
+<body class="has-orb">
+<a class="skip-link" href="#main">Skip to content</a>
+
+<!-- the way back to the index -->
+<a class="orb-home" href="../index.html" data-hue="#29E0C4"
+   style="--hue:#29E0C4" aria-label="VmesteSoft — all tools">
+  <canvas aria-hidden="true"></canvas>
+</a>
+
 
 <canvas id="drift" aria-hidden="true"></canvas>
 
-<a class="skip-link" href="#main">Skip to content</a>
-<nav class="vs-bar" aria-label="VmesteSoft tools">
-  <a class="vs-mark" href="../index.html">Vmeste<b>Soft</b></a>
-  <div class="vs-tabs">
-    <a class="vs-tab" href="../index.html"><i>00</i>Index</a>
-    <a class="vs-tab" href="../compressor/index.html"><i>01</i>Compress</a>
-    <a class="vs-tab" href="../formatter/index.html"><i>02</i>Format</a>
-    <a class="vs-tab" href="../merger/index.html"><i>03</i>Merge</a>
-    <a class="vs-tab" href="../qr/index.html"><i>04</i>QR</a>
-    <a class="vs-tab" href="../vmestenizer/index.html"><i>05</i>Vmestenize</a>
-    <a class="vs-tab" aria-current="page" href="../haiku/index.html"><i>06</i>Haiku</a>
-  </div>
-</nav>
 
 <main class="vs-shell" id="main">
-
-  <header class="vs-head">
-    <div class="vs-eyebrow"><b>06</b> / Haiku</div>
-    <h1>Daily Haiku</h1>
-    <div class="vs-rule"></div>
-  </header>
+<h1 class="sr-only">Daily Haiku</h1>
 
   <section class="hk-stage">
     <div class="hk-date" id="hkDate"></div>
@@ -342,5 +332,6 @@ document.getElementById('hkDate').textContent = today.toLocaleDateString(undefin
 })();
 </script>
 
+<script src="../orbhome.js"></script>
 </body>
 </html>

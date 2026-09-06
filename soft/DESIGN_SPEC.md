@@ -64,6 +64,8 @@ soft/
   haiku/index.html      06 · HAIKU      one deterministic haiku a day
 ```
 
+Plus `orbhome.js`, the corner sphere every tool page shares.
+
 Rules:
 
 - **`vmestesoft.css` is linked by every page and is the only place tokens live.**
@@ -241,18 +243,48 @@ No noise, no grain, no CRT curvature, no chromatic aberration.
 
 ## 5. Chrome
 
-### 5.1 Tab bar
+### 5.1 The index
 
-The one piece of shared furniture. Identical markup on every tool page.
+The index is not a tool and does not sit in a row of tools. It is a single
+character grid: the wordmark built as a 5×7 bitmap extruded into voxels and
+projected each frame, and the six tools as noise-distorted spheres shaded
+into the same grid, each in its own hue from the table in §2. Every sphere
+has a real `<a>` carrying its name positioned over it, so the page is
+clickable, tabbable and readable without seeing the art at all. No numbers
+on the labels — the name is the label, and the tools are not a sequence you
+work through in order.
 
-**The index carries no tab bar.** It is not a tool and does not belong in a
-row of tools. It is a single character grid: the wordmark built as a 5×7
-bitmap extruded into voxels and projected each frame, and the six tools as
-noise-distorted spheres shaded into the same grid, each in its own hue from
-the table in §2. Every sphere has a real `<a>` carrying its name positioned
-over it, so the page is clickable, tabbable and readable without seeing the
-art at all. No numbers on the orb labels — the name is the label, and the
-tools are not a sequence you work through in order.
+### 5.2 The home orb — the only chrome on a tool page
+
+**A tool page has no bar and no title block.** Both were furniture: the bar
+listed six things you were already looking at one of, and the title block
+named a tool whose interface names itself.
+
+What is left is the same distorted sphere the index draws, in that tool's own
+hue — the one element on a tool page allowed a colour other than `--acid`. It
+links to the index.
+
+It is **hung over the corner**, not placed inside it: `top: -46px; left: -46px`
+at 176px (128px at `-34px` under 860px), so the viewport edge crops a slice off
+the sphere and it reads as something drifting in from outside the page.
+
+Hovering or focusing swells it, brightens it into its tint, and fades in a
+single mono word, `ALL TOOLS`. **The element never changes size.** Growing the
+box would re-quantise the character grid — the sphere would climb through whole
+cells at a time and the swell would come out stepped. Instead the box is fixed
+at its fullest and the renderer eases a `grow` value toward its target a
+fraction per frame (~350ms to settle), driving radius, wobble amplitude and
+brightness together. Cells cross into the tint band a few at a time rather than
+the whole sphere flipping at once.
+
+The markup lives in the page and the shared `orbhome.js` only animates the
+canvas inside it, so the way back still works with scripts blocked. The
+tool's name stays in the page as an `sr-only` `<h1>`: invisible, but still
+there for screen readers, the tab title and search.
+
+The page offset lives on `body.has-orb`, not on the main element — each
+tool's skin sets a `padding` shorthand on its own main, which would reset a
+`padding-top` set there.
 
 ```
 ┌────────────────────────────────────────────────────────────┐
@@ -273,19 +305,6 @@ tools are not a sequence you work through in order.
   scrollbar; the active tab scrolls itself into view on load.
 - Every page also renders `<a class="skip-link" href="#main">Skip to content</a>` as
   the first body child.
-
-### 5.2 Page head
-
-Under the tab bar, every tool opens the same way — and stops:
-
-```
-02 / FORMAT                            ← eyebrow, mono, --ghost / --acid
-IMAGE FORMATTER                        ← h1, Barlow Condensed 800, --bone
-────────────────────────────────────   ← 1px --line, full width
-```
-
-Three lines. No description, no lede, no subtitle. Per §0, the name is the
-description. Then the interface starts.
 
 ### 5.3 Footer
 

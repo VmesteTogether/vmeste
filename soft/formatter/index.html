@@ -489,9 +489,16 @@ select:focus, input[type="number"]:focus {
 #status.error   { background: var(--slab); border-color: var(--line); border-left-color: var(--rust);  color: var(--bone); }
 </style>
 </head>
-<body data-view="upload">
+<body class="has-orb" data-view="upload">
+<a class="skip-link" href="#main">Skip to content</a>
 
-<a href="#main" class="skip-link">Skip to content</a>
+<!-- the way back to the index -->
+<a class="orb-home" href="../index.html" data-hue="#4DB8FF"
+   style="--hue:#4DB8FF" aria-label="VmesteSoft — all tools">
+  <canvas aria-hidden="true"></canvas>
+</a>
+
+
 <div id="liveRegion" aria-live="polite" aria-atomic="true" class="sr-only"></div>
 
 <!-- shared defs: the fuzzy chenille edge for the patch letters -->
@@ -504,25 +511,7 @@ select:focus, input[type="number"]:focus {
 </svg>
 
 <!-- HEADER — family bar -->
-<a class="skip-link" href="#main">Skip to content</a>
-<nav class="vs-bar" aria-label="VmesteSoft tools">
-  <a class="vs-mark" href="../index.html">Vmeste<b>Soft</b></a>
-  <div class="vs-tabs">
-    <a class="vs-tab" href="../index.html"><i>00</i>Index</a>
-    <a class="vs-tab" href="../compressor/index.html"><i>01</i>Compress</a>
-    <a class="vs-tab" aria-current="page" href="../formatter/index.html"><i>02</i>Format</a>
-    <a class="vs-tab" href="../merger/index.html"><i>03</i>Merge</a>
-    <a class="vs-tab" href="../qr/index.html"><i>04</i>QR</a>
-    <a class="vs-tab" href="../vmestenizer/index.html"><i>05</i>Vmestenize</a>
-    <a class="vs-tab" href="../haiku/index.html"><i>06</i>Haiku</a>
-  </div>
-</nav>
-
-<header class="vs-head vs-shell" style="padding:32px var(--gutter) 0">
-  <div class="vs-eyebrow"><b>02</b> / Format</div>
-  <h1>Image Formatter</h1>
-  <div class="vs-rule"></div>
-</header>
+<h1 class="sr-only">Image Formatter</h1>
 
 <main id="main" role="main">
 
@@ -1238,5 +1227,6 @@ els.clearBtn.addEventListener('click', () => {
 
 
 
+<script src="../orbhome.js"></script>
 </body>
 </html>

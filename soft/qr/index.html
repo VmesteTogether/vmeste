@@ -639,30 +639,19 @@ input[type=range]::-moz-range-thumb {
 }
 </style>
 </head>
-<body>
-
-
-<a href="#main-content" class="skip-link">Skip to main content</a>
-
+<body class="has-orb">
 <a class="skip-link" href="#main-content">Skip to content</a>
-<nav class="vs-bar" aria-label="VmesteSoft tools">
-  <a class="vs-mark" href="../index.html">Vmeste<b>Soft</b></a>
-  <div class="vs-tabs">
-    <a class="vs-tab" href="../index.html"><i>00</i>Index</a>
-    <a class="vs-tab" href="../compressor/index.html"><i>01</i>Compress</a>
-    <a class="vs-tab" href="../formatter/index.html"><i>02</i>Format</a>
-    <a class="vs-tab" href="../merger/index.html"><i>03</i>Merge</a>
-    <a class="vs-tab" aria-current="page" href="../qr/index.html"><i>04</i>QR</a>
-    <a class="vs-tab" href="../vmestenizer/index.html"><i>05</i>Vmestenize</a>
-    <a class="vs-tab" href="../haiku/index.html"><i>06</i>Haiku</a>
-  </div>
-</nav>
 
-<header class="vs-head vs-shell" style="padding:32px var(--gutter) 0">
-  <div class="vs-eyebrow"><b>04</b> / QR</div>
-  <h1>QR Generator</h1>
-  <div class="vs-rule"></div>
-</header>
+<!-- the way back to the index -->
+<a class="orb-home" href="../index.html" data-hue="#00E5FF"
+   style="--hue:#00E5FF" aria-label="VmesteSoft — all tools">
+  <canvas aria-hidden="true"></canvas>
+</a>
+
+
+
+
+<h1 class="sr-only">QR Generator</h1>
 
 <main id="main-content">
 
@@ -1268,5 +1257,6 @@ renderLogoOptions();
 
 
 
+<script src="../orbhome.js"></script>
 </body>
 </html>
