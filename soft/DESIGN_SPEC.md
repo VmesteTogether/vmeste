@@ -135,11 +135,32 @@ there is no light theme, and the old theme switch is removed from every tool.
 | `--ash` | `#8DAFA3` | secondary text, labels, help |
 | `--ghost` | `#4C6E64` | disabled, placeholders, hints |
 
+### The tool hues
+
+The index is the one page carrying more than one accent, because there the six tools
+*are* the content and colour is how you tell them apart. The hues are analogous — a
+sweep from cyan through green to lime — which is what lets six accents share a screen
+and still read as one set instead of a fruit bowl. They are ordered so no orb matches
+the one above it or beside it in the grid.
+
+| Tool | Hue | |
+| --- | --- | --- |
+| Compress | `#00FF9C` | the house accent |
+| Format | `#4DB8FF` | sky |
+| Merge | `#C6FF3D` | lime |
+| QR | `#00E5FF` | cyan |
+| Vmestenize | `#7CFF4D` | spring |
+| Haiku | `#29E0C4` | teal |
+
+Each renders as five steps — four shades through the sphere, plus a light tint the
+hovered orb shifts up into. **These belong to the index and nowhere else.** A tool page
+uses `--acid` and only `--acid`; it never tints itself with its own hue.
+
 ### Color rules
 
-1. **One accent per screen state.** `--acid` marks exactly one thing at a time in a
-   given region: the active tab, the focused field, the primary button. If two things
-   are acid, one of them is wrong.
+1. **One accent per screen state**, everywhere except the index. `--acid` marks exactly
+   one thing at a time in a given region: the active tab, the focused field, the primary
+   button. If two things are acid, one of them is wrong.
 2. `--toxic` appears at most **once per page**. It is a punchline, not a palette.
 3. Never put `--acid` on a large fill. It is a 1–2px stroke, a text color, or a
    ≤32px block. The only exception is a primary button.
@@ -227,10 +248,11 @@ The one piece of shared furniture. Identical markup on every tool page.
 **The index carries no tab bar.** It is not a tool and does not belong in a
 row of tools. It is a single character grid: the wordmark built as a 5×7
 bitmap extruded into voxels and projected each frame, and the six tools as
-noise-distorted spheres shaded into the same grid. Each sphere has a real
-`<a>` positioned over it, so the page is clickable, tabbable and readable
-without seeing the art at all. Everything is drawn from one ASCII ramp in
-five colour bands off the palette in §2 — nothing new is invented for it.
+noise-distorted spheres shaded into the same grid, each in its own hue from
+the table in §2. Every sphere has a real `<a>` carrying its name positioned
+over it, so the page is clickable, tabbable and readable without seeing the
+art at all. No numbers on the orb labels — the name is the label, and the
+tools are not a sequence you work through in order.
 
 ```
 ┌────────────────────────────────────────────────────────────┐
