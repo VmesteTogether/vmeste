@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src 'none'; base-uri 'self'; form-action 'none'; object-src 'none';">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#003332">
+<meta name="description" content="VmesteSoft — small browser tools that never upload anything.">
+
+<title>VmesteSoft</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vmestesoft.css">
+
+<style>
+/* ── index-only: the tool grid ── */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.tool-card {
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 24px;
+  background: var(--tar);
+  text-decoration: none;
+  position: relative;
+  transition: background 100ms linear;
+}
+.tool-card:hover { background: var(--slab); }
+.tool-card:hover .tool-name { color: var(--acid); }
+.tool-card:hover .tool-num  { color: var(--acid-dim); }
+.tool-card::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+  height: 2px; background: var(--acid);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 160ms linear;
+}
+.tool-card:hover::after { transform: scaleX(1); }
+
+.tool-num {
+  font-family: var(--mono); font-size: var(--t-micro); font-weight: 700;
+  letter-spacing: 0.18em; color: var(--ghost);
+  transition: color 100ms linear;
+}
+.tool-name {
+  font-family: var(--shout); font-weight: 800; font-size: 26px; line-height: 1;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--bone);
+  transition: color 100ms linear;
+}
+.tool-tags {
+  margin-top: auto; padding-top: 12px;
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.tool-tag {
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ghost); border: 1px solid var(--line); padding: 3px 7px;
+}
+.tool-card--toy .tool-tag { color: var(--toxic); border-color: var(--toxic); }
+
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<nav class="vs-bar" aria-label="VmesteSoft tools">
+  <a class="vs-mark" href="index.html">Vmeste<b>Soft</b></a>
+  <div class="vs-tabs">
+    <a class="vs-tab" aria-current="page" href="index.html"><i>00</i>Index</a>
+    <a class="vs-tab" href="compressor/index.html"><i>01</i>Compress</a>
+    <a class="vs-tab" href="formatter/index.html"><i>02</i>Format</a>
+    <a class="vs-tab" href="merger/index.html"><i>03</i>Merge</a>
+    <a class="vs-tab" href="qr/index.html"><i>04</i>QR</a>
+    <a class="vs-tab" href="vmestenizer/index.html"><i>05</i>Vmestenize</a>
+    <a class="vs-tab" href="haiku/index.html"><i>06</i>Haiku</a>
+  </div>
+</nav>
+
+<main class="vs-shell" id="main">
+
+  <header class="vs-head">
+    <div class="vs-eyebrow"><b>00</b> / Index</div>
+    <h1>VmesteSoft</h1>
+    <div class="vs-rule"></div>
+  </header>
+
+  <div class="tool-grid">
+
+    <a class="tool-card" href="compressor/index.html">
+      <span class="tool-num">01</span>
+      <span class="tool-name">Compress</span>
+      <span class="tool-tags">
+        <span class="tool-tag">JPG</span><span class="tool-tag">PNG</span>
+        <span class="tool-tag">WEBP</span><span class="tool-tag">HEIC</span>
+        <span class="tool-tag">Batch</span>
+      </span>
+    </a>
+
+    <a class="tool-card" href="formatter/index.html">
+      <span class="tool-num">02</span>
+      <span class="tool-name">Format</span>
+      <span class="tool-tags">
+        <span class="tool-tag">Resize</span><span class="tool-tag">Convert</span>
+        <span class="tool-tag">Rename</span><span class="tool-tag">Batch</span>
+      </span>
+    </a>
+
+    <a class="tool-card" href="merger/index.html">
+      <span class="tool-num">03</span>
+      <span class="tool-name">Merge</span>
+      <span class="tool-tags">
+        <span class="tool-tag">PDF</span><span class="tool-tag">Reorder</span>
+        <span class="tool-tag">Batch</span>
+      </span>
+    </a>
+
+    <a class="tool-card" href="qr/index.html">
+      <span class="tool-num">04</span>
+      <span class="tool-name">QR</span>
+      <span class="tool-tags">
+        <span class="tool-tag">SVG</span><span class="tool-tag">PNG</span>
+        <span class="tool-tag">Styled</span>
+      </span>
+    </a>
+
+    <a class="tool-card tool-card--toy" href="vmestenizer/index.html">
+      <span class="tool-num">05</span>
+      <span class="tool-name">Vmestenize</span>
+      <span class="tool-tags"><span class="tool-tag">Toy</span></span>
+    </a>
+
+    <a class="tool-card tool-card--toy" href="haiku/index.html">
+      <span class="tool-num">06</span>
+      <span class="tool-name">Haiku</span>
+      <span class="tool-tags"><span class="tool-tag">Toy</span></span>
+    </a>
+
+  </div>
+
+</main>
+
+</body>
+</html>
