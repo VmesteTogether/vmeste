@@ -8,8 +8,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#003332">
-<meta name="description" content="VmesteSoft — small browser tools that never upload anything.">
+<meta name="theme-color" content="#050D0B">
 
 <title>VmesteSoft</title>
 
@@ -19,134 +18,422 @@
 <link rel="stylesheet" href="vmestesoft.css">
 
 <style>
-/* ── index-only: the tool grid ── */
-.tool-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
+html, body { height: 100%; overflow: hidden; }
+body { background: var(--void); }
+
+#scene {
+  position: fixed; inset: 0;
+  display: block;
+  z-index: 0;
 }
 
-.tool-card {
-  display: flex; flex-direction: column; gap: 10px;
-  padding: 24px;
-  background: var(--tar);
+/* Each orb is a real link sitting over its own patch of the canvas, so the
+   scene is clickable, tabbable and readable without seeing the art at all. */
+.orb-link {
+  position: absolute;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
   text-decoration: none;
-  position: relative;
-  transition: background 100ms linear;
+  z-index: 2;
+  padding-bottom: 2px;
+  -webkit-tap-highlight-color: transparent;
 }
-.tool-card:hover { background: var(--slab); }
-.tool-card:hover .tool-name { color: var(--acid); }
-.tool-card:hover .tool-num  { color: var(--acid-dim); }
-.tool-card::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 0;
-  height: 2px; background: var(--acid);
-  transform: scaleX(0); transform-origin: left;
-  transition: transform 160ms linear;
-}
-.tool-card:hover::after { transform: scaleX(1); }
-
-.tool-num {
-  font-family: var(--mono); font-size: var(--t-micro); font-weight: 700;
-  letter-spacing: 0.18em; color: var(--ghost);
-  transition: color 100ms linear;
-}
-.tool-name {
-  font-family: var(--shout); font-weight: 800; font-size: 26px; line-height: 1;
-  letter-spacing: 0.04em; text-transform: uppercase; color: var(--bone);
-  transition: color 100ms linear;
-}
-.tool-tags {
-  margin-top: auto; padding-top: 12px;
-  display: flex; flex-wrap: wrap; gap: 6px;
-}
-.tool-tag {
+.orb-link i {
+  font-style: normal;
   font-family: var(--mono); font-size: 10px; font-weight: 700;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ghost); border: 1px solid var(--line); padding: 3px 7px;
+  letter-spacing: 0.24em; color: var(--ghost);
+  transition: color 100ms linear;
 }
-.tool-card--toy .tool-tag { color: var(--toxic); border-color: var(--toxic); }
+.orb-link span {
+  font-family: var(--shout); font-weight: 800; font-size: 17px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ash);
+  transition: color 100ms linear;
+  white-space: nowrap;
+}
+.orb-link:hover i, .orb-link:focus-visible i { color: var(--acid-dim); }
+.orb-link:hover span, .orb-link:focus-visible span { color: var(--acid); }
+.orb-link:focus-visible { outline: 1px solid var(--acid); outline-offset: 4px; }
 
+/* The one piece of chrome left: a way back into the system. */
+.jump {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 3;
+  display: flex; justify-content: center; gap: 2px;
+  padding: 14px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 160ms linear;
+}
+.jump:focus-within { opacity: 1; pointer-events: auto; }
+.jump a {
+  font-family: var(--mono); font-size: var(--t-micro); font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ash); text-decoration: none;
+  padding: 6px 10px; border: 1px solid var(--line);
+}
+.jump a:focus-visible { color: var(--acid); border-color: var(--acid); }
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
-<nav class="vs-bar" aria-label="VmesteSoft tools">
-  <a class="vs-mark" href="index.html">Vmeste<b>Soft</b></a>
-  <div class="vs-tabs">
-    <a class="vs-tab" aria-current="page" href="index.html"><i>00</i>Index</a>
-    <a class="vs-tab" href="compressor/index.html"><i>01</i>Compress</a>
-    <a class="vs-tab" href="formatter/index.html"><i>02</i>Format</a>
-    <a class="vs-tab" href="merger/index.html"><i>03</i>Merge</a>
-    <a class="vs-tab" href="qr/index.html"><i>04</i>QR</a>
-    <a class="vs-tab" href="vmestenizer/index.html"><i>05</i>Vmestenize</a>
-    <a class="vs-tab" href="haiku/index.html"><i>06</i>Haiku</a>
-  </div>
-</nav>
 
-<main class="vs-shell" id="main">
+<h1 class="sr-only">VmesteSoft</h1>
 
-  <header class="vs-head">
-    <div class="vs-eyebrow"><b>00</b> / Index</div>
-    <h1>VmesteSoft</h1>
-    <div class="vs-rule"></div>
-  </header>
+<canvas id="scene" aria-hidden="true"></canvas>
 
-  <div class="tool-grid">
+<nav id="orbs" aria-label="Tools"></nav>
 
-    <a class="tool-card" href="compressor/index.html">
-      <span class="tool-num">01</span>
-      <span class="tool-name">Compress</span>
-      <span class="tool-tags">
-        <span class="tool-tag">JPG</span><span class="tool-tag">PNG</span>
-        <span class="tool-tag">WEBP</span><span class="tool-tag">HEIC</span>
-        <span class="tool-tag">Batch</span>
-      </span>
-    </a>
+<script>
+'use strict';
 
-    <a class="tool-card" href="formatter/index.html">
-      <span class="tool-num">02</span>
-      <span class="tool-name">Format</span>
-      <span class="tool-tags">
-        <span class="tool-tag">Resize</span><span class="tool-tag">Convert</span>
-        <span class="tool-tag">Rename</span><span class="tool-tag">Batch</span>
-      </span>
-    </a>
+/* ════════════════════════════════════════════════════════════════
+   One character grid holds the whole page.
 
-    <a class="tool-card" href="merger/index.html">
-      <span class="tool-num">03</span>
-      <span class="tool-name">Merge</span>
-      <span class="tool-tags">
-        <span class="tool-tag">PDF</span><span class="tool-tag">Reorder</span>
-        <span class="tool-tag">Batch</span>
-      </span>
-    </a>
+   The wordmark is a 5×7 bitmap extruded into voxels, rotated and
+   projected each frame with a depth test — the ASCII ramp is chosen
+   by depth, so the letters read as solid rather than outlined.
 
-    <a class="tool-card" href="qr/index.html">
-      <span class="tool-num">04</span>
-      <span class="tool-name">QR</span>
-      <span class="tool-tags">
-        <span class="tool-tag">SVG</span><span class="tool-tag">PNG</span>
-        <span class="tool-tag">Styled</span>
-      </span>
-    </a>
+   The tools are distorted spheres shaded into the same grid: a radius
+   modulated by summed sines, a fake normal for lighting, and an
+   interior plasma term so they churn instead of just spinning.
+   ════════════════════════════════════════════════════════════════ */
 
-    <a class="tool-card tool-card--toy" href="vmestenizer/index.html">
-      <span class="tool-num">05</span>
-      <span class="tool-name">Vmestenize</span>
-      <span class="tool-tags"><span class="tool-tag">Toy</span></span>
-    </a>
+const LABEL_PX = 30;   // room under each sphere for its number and name
+const RAMP = ' .:-=+*#%@';                     // 0 is empty
+const BANDS = [
+  'rgba(0,184,113,0.30)',   // 0 — far body
+  'rgba(0,184,113,0.62)',   // 1 — mid
+  '#00B871',                // 2 — near
+  '#00FF9C',                // 3 — face / hot
+  '#C6FF3D'                 // 4 — the orb under the cursor
+];
 
-    <a class="tool-card tool-card--toy" href="haiku/index.html">
-      <span class="tool-num">06</span>
-      <span class="tool-name">Haiku</span>
-      <span class="tool-tags"><span class="tool-tag">Toy</span></span>
-    </a>
+const TOOLS = [
+  { n: '01', label: 'Compress',   href: 'compressor/index.html'  },
+  { n: '02', label: 'Format',     href: 'formatter/index.html'   },
+  { n: '03', label: 'Merge',      href: 'merger/index.html'      },
+  { n: '04', label: 'QR',         href: 'qr/index.html'          },
+  { n: '05', label: 'Vmestenize', href: 'vmestenizer/index.html' },
+  { n: '06', label: 'Haiku',      href: 'haiku/index.html'       }
+];
 
-  </div>
+/* ── 5×7 glyphs, only the letters the wordmark needs ── */
+const GLYPHS = {
+  V: ['#...#', '#...#', '#...#', '#...#', '#...#', '.#.#.', '..#..'],
+  M: ['#...#', '##.##', '#.#.#', '#.#.#', '#...#', '#...#', '#...#'],
+  E: ['#####', '#....', '#....', '####.', '#....', '#....', '#####'],
+  S: ['.####', '#....', '#....', '.###.', '....#', '....#', '####.'],
+  T: ['#####', '..#..', '..#..', '..#..', '..#..', '..#..', '..#..'],
+  O: ['.###.', '#...#', '#...#', '#...#', '#...#', '#...#', '.###.'],
+  F: ['#####', '#....', '#....', '####.', '#....', '#....', '#....']
+};
+const LINES = ['VMESTE', 'SOFT'];
 
-</main>
+const canvas = document.getElementById('scene');
+const ctx = canvas.getContext('2d', { alpha: false });
+const nav = document.getElementById('orbs');
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let W, H, dpr, cols, rows, charW, charH, fontPx;
+let chars, band, tz, tset;
+let voxels = null, voxCount = 0;
+let hovered = -1;
+
+/* ── build the extruded wordmark once; only projection runs per frame ── */
+const GAP = 7;                                  // per-letter advance, 5 wide + 2 clear
+function lineWidth(w) { return w.length * GAP - (GAP - 5); }
+function blockWidth() { return Math.max(...LINES.map(lineWidth)); }
+
+function buildVoxels(sub, deep) {
+  const out = [];
+  const lineH = 7, lead = 9;                    // glyph height, line advance
+  const blockH = LINES.length * lead - (lead - lineH);
+
+  LINES.forEach((word, wi) => {
+    const w = lineWidth(word);
+    for (let li = 0; li < word.length; li++) {
+      const g = GLYPHS[word[li]];
+      for (let by = 0; by < lineH; by++) {
+        for (let bx = 0; bx < 5; bx++) {
+          if (g[by][bx] !== '#') continue;
+          const px = li * GAP + bx - w / 2;      // each line centred on its own
+          const py = wi * lead + by - blockH / 2;
+          for (let sy = 0; sy < sub; sy++)
+            for (let sx = 0; sx < sub; sx++)
+              for (let z = 0; z < deep; z++)
+                out.push(
+                  px + sx / sub, py + sy / sub,
+                  (z / (deep - 1) - 0.5) * (deep * 0.34),
+                  z / deep + wi                // depth through the letter (< 1), + line index
+                );
+        }
+      }
+    }
+  });
+  voxCount = out.length / 4;
+  voxels = Float32Array.from(out);
+}
+
+function layout() {
+  dpr = Math.min(devicePixelRatio || 1, 2);
+  W = innerWidth; H = innerHeight;
+  // a zero viewport (hidden tab, pane not yet sized) would clamp the grid to
+  // its minimum and bake a broken scene; wait for a real one instead
+  if (W < 2 || H < 2) { requestAnimationFrame(layout); return; }
+  canvas.width = Math.floor(W * dpr);
+  canvas.height = Math.floor(H * dpr);
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+
+  fontPx = W < 620 ? 6 : W < 1000 ? 7 : 7;
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.font = '700 ' + fontPx + 'px "Space Mono", ui-monospace, monospace';
+  ctx.textBaseline = 'top';
+
+  charW = ctx.measureText('MMMMMMMMMM').width / 10;   // measured, never assumed
+  charH = fontPx * 0.98;
+  cols = Math.max(40, Math.floor(W / charW));
+  rows = Math.max(30, Math.floor(H / charH));
+
+  chars = new Uint8Array(cols * rows);
+  band  = new Uint8Array(cols * rows);
+  tz    = new Float32Array(cols * rows);
+  tset  = new Uint8Array(cols * rows);
+
+  // enough sub-samples that the projected voxels leave no holes
+  const scale = titleScale();
+  buildVoxels(Math.max(2, Math.min(4, Math.ceil(scale) + 1)), W < 620 ? 5 : 7);
+}
+
+function titleScale() {
+  const blockH = LINES.length * 9 - 2;
+  return Math.min((cols * 0.42) / blockWidth(), (rows * 0.26) / (blockH * 0.9));
+}
+
+/* ── the wordmark ── */
+function drawTitle(t) {
+  const yaw   = still ? 0.26 : Math.sin(t * 0.00042) * 0.30;
+  const pitch = still ? 0.10 : Math.sin(t * 0.00031) * 0.13 + 0.06;
+  const cy = Math.cos(yaw), sy = Math.sin(yaw);
+  const cp = Math.cos(pitch), sp = Math.sin(pitch);
+
+  const scale = titleScale();
+  const ox = cols / 2;
+  const oy = rows * 0.18;
+  const focal = 58;
+
+  for (let i = 0; i < voxCount; i++) {
+    const v = i * 4;
+    const vx = voxels[v], vy = voxels[v + 1], vz = voxels[v + 2], vd = voxels[v + 3];
+
+    let x = vx * cy + vz * sy;
+    let z = -vx * sy + vz * cy;
+    const y = vy * cp - z * sp;
+    z = vy * sp + z * cp;
+
+    const k = focal / (focal + z);
+    const col = (ox + x * scale * k) | 0;
+    const row = (oy + y * scale * k * 0.9) | 0;
+    if (col < 0 || col >= cols || row < 0 || row >= rows) continue;
+
+    const through = vd % 1;                    // 0 at the face, 1 at the back
+    const isSoft = vd >= 1;                    // the tagged second line
+
+    const idx = row * cols + col;
+    // shallowest-through wins: the face stays solid under any rotation, and
+    // the extruded body only shows where the face doesn't cover
+    if (tset[idx] && through >= tz[idx]) continue;
+    tset[idx] = 1; tz[idx] = through;
+
+    const shade = 1 - through * 0.86;
+    chars[idx] = 1 + Math.min(RAMP.length - 2, (shade * (RAMP.length - 1)) | 0);
+    let b = through < 0.10 ? 3 : through < 0.36 ? 2 : through < 0.70 ? 1 : 0;
+    if (!isSoft && b > 0) b -= 1;               // VMESTE reads a step cooler
+    band[idx] = b;
+  }
+  tset.fill(0);
+}
+
+/* ── one distorted orb ── */
+function drawOrb(o, t, hot) {
+  const aspect = charW / charH;
+  const amp = hot ? 0.38 : 0.24;
+  const r = o.r * (hot ? 1.14 : 1);
+  const reach = r * 1.42;
+
+  const c0 = Math.max(0, Math.floor(o.x - reach / aspect));
+  const c1 = Math.min(cols - 1, Math.ceil(o.x + reach / aspect));
+  const r0 = Math.max(0, Math.floor(o.y - reach));
+  const r1 = Math.min(rows - 1, Math.ceil(o.y + reach));
+
+  for (let row = r0; row <= r1; row++) {
+    const dy = row - o.y;
+    for (let col = c0; col <= c1; col++) {
+      const dx = (col - o.x) * aspect;
+      const d = Math.hypot(dx, dy);
+      if (d > reach) continue;
+
+      // the distortion: three sines around the circumference, drifting
+      const ang = Math.atan2(dy, dx);
+      const rr = r * (1
+        + amp * 0.55 * Math.sin(ang * 3 + t * 0.0017 + o.seed)
+        + amp * 0.32 * Math.sin(ang * 5 - t * 0.0011 + o.seed * 2)
+        + amp * 0.20 * Math.sin(ang * 8 + t * 0.0023));
+
+      const idx = row * cols + col;
+
+      if (d > rr) {
+        // a thin corona, only where the surface has bulged outward
+        if (d < rr * 1.10 && !chars[idx]) { chars[idx] = 1; band[idx] = hot ? 4 : 0; }
+        continue;
+      }
+
+      // the ball itself: lit from within, falling off to a dark limb
+      const u = d / rr;
+      const nz = Math.sqrt(Math.max(0, 1 - u * u));
+
+      // plasma churn across the surface — three drifting waves, so the
+      // brightness never settles into a fixed pattern
+      const churn =
+          0.42 * Math.sin(dx * 0.46 + t * 0.0026 + o.seed)
+                * Math.sin(dy * 0.52 - t * 0.0019 + o.seed)
+        + 0.30 * Math.sin((dx + dy) * 0.33 - t * 0.0015 + o.seed * 2)
+        + 0.22 * Math.sin(d * 1.15 - t * 0.0034 + o.seed);
+
+      let v = Math.pow(nz, 0.62) * (0.62 + 0.38 * churn)
+            + 0.30 * nz * nz * nz;              // hot core
+
+      v = Math.min(1, Math.max(0, v)) * o.dim;
+      if (v < 0.10) continue;                   // leave the dead cells empty
+
+      chars[idx] = 1 + Math.min(RAMP.length - 2, (v * (RAMP.length - 1)) | 0);
+      band[idx] = hot ? 4 : v > 0.70 ? 3 : v > 0.46 ? 2 : v > 0.24 ? 1 : 0;
+    }
+  }
+}
+
+/* ── orb positions: a slow ring, tilted so some hang behind the others ── */
+const orbs = TOOLS.map((tool, i) => ({ tool, seed: i * 1.7, x: 0, y: 0, r: 0, dim: 1, z: 0 }));
+
+const links = orbs.map((o, i) => {
+  const a = document.createElement('a');
+  a.className = 'orb-link';
+  a.href = o.tool.href;
+  a.innerHTML = '<i>' + o.tool.n + '</i><span>' + o.tool.label + '</span>';
+  a.addEventListener('pointerenter', () => { hovered = i; });
+  a.addEventListener('pointerleave', () => { if (hovered === i) hovered = -1; });
+  a.addEventListener('focus', () => { hovered = i; });
+  a.addEventListener('blur', () => { if (hovered === i) hovered = -1; });
+  nav.appendChild(a);
+  return a;
+});
+
+function placeOrbs(t) {
+  // Derive the grid from the space that's actually left under the wordmark,
+  // rather than fixing a shape that only works on one screen. Three across
+  // when there's width for it, two when there isn't.
+  const aspect = aspectOf();
+  const perRow = cols >= 150 ? 3 : 2;
+  const nRows = orbs.length / perRow;
+
+  const clusterTop = rows * (perRow === 3 ? 0.40 : 0.34);
+  const avail = rows * 0.98 - clusterTop;
+  const cellH = avail / nRows;
+  const cellW = (cols * 0.94) / perRow;
+
+  // a sphere has to fit its cell in both directions, label included
+  const baseR = Math.max(4, Math.min(
+    (cellH - LABEL_PX / charH) / 2.5,      // height, minus room for the label
+    (cellW * aspect) / 2.5,                // width, in the same units as rows
+    17
+  ));
+
+  const colGap = cellW;
+  const rowGap = cellH;
+  const cx = cols / 2;
+  const cy = clusterTop + avail / 2;
+
+  for (let i = 0; i < orbs.length; i++) {
+    const o = orbs[i];
+    const gx = i % perRow, gy = (i / perRow) | 0;
+
+    // each orb runs its own slow depth cycle, so the cluster breathes
+    // instead of moving as one rigid object
+    const zc = Math.sin(t * 0.00023 + i * 1.05);
+
+    o.x = cx + (gx - (perRow - 1) / 2) * colGap
+             + Math.sin(t * 0.00041 + i * 2.1) * 2.0;
+    o.y = cy + (gy - (nRows - 1) / 2) * rowGap
+             + Math.sin(t * 0.00088 + i * 1.7) * 1.3;
+    o.z = zc;
+    o.r = baseR * (0.84 + 0.22 * (zc + 1) / 2);
+    o.dim = 0.74 + 0.26 * (zc + 1) / 2;
+
+    // the hit area covers the sphere, with the label hung underneath it
+    const wpx = (o.r * 2.3 / aspect) * charW;
+    const hpx = o.r * 2.1 * charH;
+    const el = links[i];
+    el.style.left   = (o.x * charW - wpx / 2) + 'px';
+    el.style.top    = ((o.y - o.r) * charH) + 'px';
+    el.style.width  = wpx + 'px';
+    el.style.height = (hpx + LABEL_PX) + 'px';
+    el.style.opacity = (0.66 + 0.34 * (zc + 1) / 2).toFixed(2);
+  }
+}
+
+function aspectOf() { return charW / charH; }
+
+/* ── paint the grid: one fillText per colour band per row ── */
+const rowBuf = [];
+function paint() {
+  ctx.fillStyle = '#050D0B';
+  ctx.fillRect(0, 0, W, H);
+
+  for (let row = 0; row < rows; row++) {
+    const base = row * cols;
+    let used = 0;
+    for (let col = 0; col < cols; col++) if (chars[base + col]) used |= 1 << band[base + col];
+    if (!used) continue;
+
+    for (let b = 0; b < BANDS.length; b++) {
+      if (!(used & (1 << b))) continue;
+      rowBuf.length = 0;
+      let any = false;
+      for (let col = 0; col < cols; col++) {
+        const c = chars[base + col];
+        if (c && band[base + col] === b) { rowBuf.push(RAMP[c]); any = true; }
+        else rowBuf.push(' ');
+      }
+      if (!any) continue;
+      ctx.fillStyle = BANDS[b];
+      ctx.fillText(rowBuf.join(''), 0, row * charH);
+    }
+  }
+}
+
+function frame(t) {
+  chars.fill(0); band.fill(0);
+  placeOrbs(t);
+  drawTitle(t);
+  // back to front, so the near orbs cover the far ones
+  const order = orbs.map((o, i) => i).sort((a, b) => orbs[a].z - orbs[b].z);
+  for (const i of order) drawOrb(orbs[i], t, i === hovered);
+  paint();
+}
+
+layout();
+addEventListener('resize', () => { layout(); if (still) frame(4200); }, { passive: true });
+if (document.fonts) document.fonts.ready.then(() => { layout(); if (still) frame(4200); });
+
+if (still) {
+  frame(4200);
+} else {
+  let last = 0;
+  (function loop(t) {
+    requestAnimationFrame(loop);
+    if (t - last < 33) return;      // 30fps is plenty for a character grid
+    last = t;
+    frame(t);
+  })(0);
+}
+</script>
 
 </body>
 </html>

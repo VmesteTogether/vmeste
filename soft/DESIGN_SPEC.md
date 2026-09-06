@@ -222,7 +222,15 @@ No noise, no grain, no CRT curvature, no chromatic aberration.
 
 ### 5.1 Tab bar
 
-The one piece of shared furniture. Identical markup on every page.
+The one piece of shared furniture. Identical markup on every tool page.
+
+**The index carries no tab bar.** It is not a tool and does not belong in a
+row of tools. It is a single character grid: the wordmark built as a 5×7
+bitmap extruded into voxels and projected each frame, and the six tools as
+noise-distorted spheres shaded into the same grid. Each sphere has a real
+`<a>` positioned over it, so the page is clickable, tabbable and readable
+without seeing the art at all. Everything is drawn from one ASCII ramp in
+five colour bands off the palette in §2 — nothing new is invented for it.
 
 ```
 ┌────────────────────────────────────────────────────────────┐
