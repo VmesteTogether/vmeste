@@ -13,7 +13,7 @@
   if (!link) return;
 
   const canvas = link.querySelector('canvas');
-  const ctx = canvas && canvas.getContext('2d', { alpha: false });
+  const ctx = canvas && canvas.getContext('2d');   // transparent: only the glyphs paint
   if (!ctx) return;
 
   const hue = link.dataset.hue || '#00FF9C';
@@ -120,8 +120,7 @@
       }
     }
 
-    ctx.fillStyle = '#050D0B';
-    ctx.fillRect(0, 0, W, H);
+    ctx.clearRect(0, 0, W, H);
     for (let row = 0; row < rows; row++) {
       const base = row * cols;
       for (let b = 0; b < SHADES.length; b++) {

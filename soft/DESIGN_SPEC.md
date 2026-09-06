@@ -264,9 +264,15 @@ What is left is the same distorted sphere the index draws, in that tool's own
 hue — the one element on a tool page allowed a colour other than `--acid`. It
 links to the index.
 
-It is **hung over the corner**, not placed inside it: `top: -46px; left: -46px`
-at 176px (128px at `-34px` under 860px), so the viewport edge crops a slice off
-the sphere and it reads as something drifting in from outside the page.
+It is **hung over the corner**, not placed inside it: `top: -64px; left: -64px`
+at 176px (128px at `-48px` under 860px), so the viewport edge crops a slice off
+the sphere and it reads as something drifting in from outside the page. Its
+canvas is transparent and clears rather than fills — an opaque one painted its
+own background over the page and left a dark square in the corner.
+
+**Do not sweep this stylesheet for dead rules with a line-level regex.** One
+did, and it took `.vs-shell` and `h2` with the tab-bar rules it was aimed at.
+Remove rules by matching a selector and walking to its closing brace.
 
 Hovering or focusing swells it, brightens it into its tint, and fades in a
 single mono word, `ALL TOOLS`. **The element never changes size.** Growing the

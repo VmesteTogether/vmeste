@@ -135,7 +135,7 @@ body {
      the page. The box never changes size — growing it would re-quantise the
      character grid and the swell would come out stepped. The sphere itself
      eases, in the renderer. */
-  position: fixed; top: -46px; left: -46px; z-index: 200;
+  position: fixed; top: -64px; left: -64px; z-index: 200;
   display: block; width: 176px; height: 176px;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
@@ -144,7 +144,7 @@ body {
 
 .orb-home::after {
   content: 'All tools';
-  position: absolute; right: 6px; bottom: 8px;
+  position: absolute; left: 100%; bottom: 12px; margin-left: -46px;
   font-family: var(--mono); font-size: 9px; font-weight: 700;
   letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--hue, var(--acid)); white-space: nowrap;
@@ -156,11 +156,28 @@ body {
 /* Every tool page starts below the orb at its fullest. This lives on <body>
    because each tool's skin sets a `padding` shorthand on its own main
    element, which would reset a padding-top set there. */
-body.has-orb { padding-top: 148px; }
+body.has-orb { padding-top: 132px; }
 
 @media (max-width: 860px) {
-  .orb-home { width: 128px; height: 128px; top: -34px; left: -34px; }
-  body.has-orb { padding-top: 108px; }
+  .orb-home { width: 128px; height: 128px; top: -48px; left: -48px; }
+  body.has-orb { padding-top: 100px; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SHELL
+   ════════════════════════════════════════════════════════════════ */
+
+.vs-shell {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 40px var(--gutter) 80px;
+}
+
+h2 {
+  font-family: var(--shout); font-weight: 800;
+  font-size: var(--t-title); line-height: 1.1;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--bone);
 }
 
 /* ════════════════════════════════════════════════════════════════
