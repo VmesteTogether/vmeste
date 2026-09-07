@@ -250,20 +250,35 @@ character grid: the wordmark built as a 5×7 bitmap extruded into voxels and
 projected each frame, and the six tools as noise-distorted spheres shaded
 into the same grid, each in its own hue from the table in §2.
 
-The wordmark sets on **one line above 900px and stacks to VMESTE / SOFT below
-it** — one line needs roughly 68 cells of width before the letters stop being
-legible against their own extrusion. Either way it is the same ten letters and
-letters 6–9 are SOFT, which is what the brighter band keys off, so the
-wordmark reads the same in both layouts.
+The wordmark is set **`VMestesoft`** — caps on the V and M, lowercase for the
+rest, so it reads as the `vm` the Vmestenizer bolts onto every word, with the
+name trailing off it. Lowercase glyphs sit on the baseline at x-height; only
+`f` and `t` carry ascenders. It sets on one line above 900px and stacks to
+`VMeste` / `soft` below. Either way it is the same ten letters and letters 6–9
+are `soft`, which is what the brighter band keys off, so it reads the same in
+both layouts. (The document `<title>` and the `sr-only` `<h1>` stay
+**VmesteSoft** — this is a logotype's capitalisation, not the product's name.)
 
-**The cursor erupts it.** Within a radius that scales with the wordmark, each
-voxel is pushed radially out of the hot zone, jittered per-voxel, and some
-rows tear sideways; the glyphs there corrupt into `/\|<>[]{}!?$&#@%*` held at
-~18 changes/sec so it churns rather than fizzing into white noise, and
-recolours to lime and a hot tint. Voxels that move stop writing the cell they
-left, so the wordmark opens into holes instead of smearing. Strength is eased
-in and out, so it follows the pointer continuously and decays to nothing when
-it leaves. Under `prefers-reduced-motion` it never engages. Every sphere
+**It is drawn, not set.** Every letter gets its own small tilt (±5°), baseline
+drift and size, and every voxel a little edge wobble. All of it is seeded by
+index rather than by time — seed it by time and the letterforms boil.
+
+**The cursor melts it.** Within a radius that scales with the wordmark, the
+neighbourhood is *warped* rather than thrown clear: swirled around the pointer
+by up to ~120°, pushed by a travelling ripple, and bloomed slightly outward so
+it reads as pressure. The voxels stay near where they were, so the letterform
+survives as a melted version of itself instead of vanishing into a hole — the
+letters underneath stay legible the whole time, just dimmed by a band or two.
+
+Corruption is **scattered through** that warp, never solid. The chance a voxel
+turns into a glyph from `/\|<>[]{}!?$&#@%*` climbs with the eruption but is
+capped below 1, so bright junk erupts *through* the warped letters rather than
+replacing them. Corrupted glyphs are held at ~18 changes/sec — redraw them
+every frame and it fizzes into white noise instead of churning.
+
+Strength is eased both ways, so it follows the pointer continuously and decays
+to exactly nothing when it leaves. Under `prefers-reduced-motion` it never
+engages. Every sphere
 has a real `<a>` carrying its name positioned over it, so the page is
 clickable, tabbable and readable without seeing the art at all. No numbers
 on the labels — the name is the label, and the tools are not a sequence you

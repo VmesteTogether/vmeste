@@ -146,19 +146,32 @@ const TOOLS = [
 
 /* ── 5×7 glyphs, only the letters the wordmark needs ── */
 const GLYPHS = {
+  // caps — the VM that every Vmestenized word wears
   V: ['#...#', '#...#', '#...#', '#...#', '#...#', '.#.#.', '..#..'],
   M: ['#...#', '##.##', '#.#.#', '#.#.#', '#...#', '#...#', '#...#'],
-  E: ['#####', '#....', '#....', '####.', '#....', '#....', '#####'],
-  S: ['.####', '#....', '#....', '.###.', '....#', '....#', '####.'],
-  T: ['#####', '..#..', '..#..', '..#..', '..#..', '..#..', '..#..'],
-  O: ['.###.', '#...#', '#...#', '#...#', '#...#', '#...#', '.###.'],
-  F: ['#####', '#....', '#....', '####.', '#....', '#....', '#....']
+  // lowercase, sitting on the baseline; ascenders on f and t
+  e: ['.....', '.....', '.###.', '#...#', '#####', '#....', '.###.'],
+  s: ['.....', '.....', '.####', '#....', '.###.', '....#', '####.'],
+  o: ['.....', '.....', '.###.', '#...#', '#...#', '#...#', '.###.'],
+  t: ['.#...', '.#...', '####.', '.#...', '.#...', '.#...', '..##.'],
+  f: ['..##.', '.#...', '####.', '.#...', '.#...', '.#...', '.#...']
 };
 /* One line where it fits, two where it doesn't. Either way it is the same
    ten letters, and letters 6-9 are SOFT — which is what the brighter band
    keys off, so the wordmark reads identically in both layouts. */
-let LINES = ['VMESTESOFT'];
-const SOFT_AT = 6;
+let LINES = ['VMestesoft'];
+const SOFT_AT = 6;                              // letters 6-9 are 'soft'
+
+/* Stable hash — the hand-drawn wobble has to be the SAME every frame, or the
+   letters boil. Seeded by letter and voxel, never by time. */
+function hash01(n) {
+  n = (n ^ 61) ^ (n >>> 16);
+  n = n + (n << 3);
+  n = n ^ (n >>> 4);
+  n = Math.imul(n, 0x27d4eb2d);
+  n = n ^ (n >>> 15);
+  return ((n >>> 0) % 100000) / 100000;
+}
 
 const canvas = document.getElementById('scene');
 const ctx = canvas.getContext('2d', { alpha: false });
@@ -184,7 +197,7 @@ addEventListener('pointerleave', () => { mTarget = 0; }, { passive: true });
 addEventListener('blur', () => { mTarget = 0; });
 
 /* ── build the extruded wordmark once; only projection runs per frame ── */
-const GAP = 7;                                  // per-letter advance, 5 wide + 2 clear
+const GAP = 9;                                  // per-letter advance, 5 wide + 4 clear
 function lineWidth(w) { return w.length * GAP - (GAP - 5); }
 function blockWidth() { return Math.max(...LINES.map(lineWidth)); }
 
@@ -198,19 +211,43 @@ function buildVoxels(sub, deep) {
     const w = lineWidth(word);
     for (let li = 0; li < word.length; li++, letter++) {
       const g = GLYPHS[word[li]];
+      if (!g) continue;
+
+      /* Hand-drawn, not machine-set: every letter gets its own small tilt,
+         baseline drift and size, and every voxel a little edge wobble. All of
+         it is seeded by index rather than time, so the letterforms hold still
+         instead of boiling. */
+      const rot = (hash01(letter * 7 + 1) - 0.5) * 0.17;   // ±5°
+      const dx  = (hash01(letter * 7 + 2) - 0.5) * 0.55;
+      const dy  = (hash01(letter * 7 + 3) - 0.5) * 0.55;
+      const sc  = 0.93 + hash01(letter * 7 + 4) * 0.13;
+      const ct = Math.cos(rot), st = Math.sin(rot);
+
       for (let by = 0; by < lineH; by++) {
         for (let bx = 0; bx < 5; bx++) {
           if (g[by][bx] !== '#') continue;
-          const px = li * GAP + bx - w / 2;      // each line centred on its own
-          const py = wi * lead + by - blockH / 2;
-          for (let sy = 0; sy < sub; sy++)
-            for (let sx = 0; sx < sub; sx++)
-              for (let z = 0; z < deep; z++)
+          for (let sy = 0; sy < sub; sy++) {
+            for (let sx = 0; sx < sub; sx++) {
+              // local coords about the letter's own centre
+              const seed = letter * 977 + by * 61 + bx * 7 + sy * 3 + sx;
+              let lx = bx + sx / sub - 2 + (hash01(seed) - 0.5) * 0.46;
+              let ly = by + sy / sub - 3 + (hash01(seed + 51) - 0.5) * 0.46;
+
+              const rx = (lx * ct - ly * st) * sc + dx;
+              const ry = (lx * st + ly * ct) * sc + dy;
+
+              const px = li * GAP + 2 + rx - w / 2;
+              const py = wi * lead + 3 + ry - blockH / 2;
+
+              for (let z = 0; z < deep; z++) {
                 out.push(
-                  px + sx / sub, py + sy / sub,
-                  (z / (deep - 1) - 0.5) * (deep * 0.34),
-                  z / deep + (letter >= SOFT_AT ? 1 : 0)   // depth (< 1), + SOFT flag
+                  px, py,
+                  (z / (deep - 1) - 0.5) * (deep * 0.26),
+                  z / deep + (letter >= SOFT_AT ? 1 : 0)   // depth (< 1), + soft flag
                 );
+              }
+            }
+          }
         }
       }
     }
@@ -232,7 +269,7 @@ function layout() {
 
   fontPx = W < 620 ? 6 : W < 1000 ? 7 : 7;
   // one line needs ~68 cells of width to stay legible; below that it stacks
-  LINES = W < 900 ? ['VMESTE', 'SOFT'] : ['VMESTESOFT'];
+  LINES = W < 900 ? ['VMeste', 'soft'] : ['VMestesoft'];
 
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.font = '700 ' + fontPx + 'px "Space Mono", ui-monospace, monospace';
@@ -250,17 +287,19 @@ function layout() {
 
   // enough sub-samples that the projected voxels leave no holes
   const scale = titleScale();
-  buildVoxels(Math.max(2, Math.min(4, Math.ceil(scale) + 1)), W < 620 ? 5 : 7);
+  buildVoxels(Math.max(3, Math.min(4, Math.ceil(scale) + 1)), W < 620 ? 5 : 6);
 }
 
 function titleScale() {
   const blockH = LINES.length * 9 - 2;
-  return Math.min((cols * 0.42) / blockWidth(), (rows * 0.26) / (blockH * 0.9));
+  const wide = LINES.length === 1;
+  return Math.min((cols * (wide ? 0.80 : 0.72)) / blockWidth(),
+                  (rows * 0.34) / (blockH * 0.9));
 }
 
 /* ── the wordmark ── */
 function drawTitle(t) {
-  const yaw   = still ? 0.26 : Math.sin(t * 0.00042) * 0.30;
+  const yaw   = still ? 0.22 : Math.sin(t * 0.00042) * 0.24;
   const pitch = still ? 0.10 : Math.sin(t * 0.00031) * 0.13 + 0.06;
   const cy = Math.cos(yaw), sy = Math.sin(yaw);
   const cp = Math.cos(pitch), sp = Math.sin(pitch);
@@ -301,13 +340,27 @@ function drawTitle(t) {
         const f = 1 - dd / R;
         erupt = f * f * mAmt;
         const inv = dd > 0.001 ? 1 / dd : 0;
-        const push = erupt * R * 0.55;
-        fc += (ddx * inv * push) / aspect;
-        fr += ddy * inv * push;
-        fc += Math.sin(t * 0.021 + i * 0.7) * erupt * 2.6;
-        fr += Math.cos(t * 0.017 + i * 1.3) * erupt * 1.6;
+
+        // swirl the neighbourhood around the cursor rather than throwing it
+        // clear: the voxels stay put, so the letter survives as a melted
+        // version of itself instead of vanishing into a hole
+        const ang = erupt * 2.1;
+        const ca = Math.cos(ang), sa = Math.sin(ang);
+        let nx = ddx * ca - ddy * sa;
+        let ny = ddx * sa + ddy * ca;
+
+        // a travelling ripple, plus just enough outward bloom to read as pressure
+        const rip = Math.sin(dd * 0.5 - t * 0.006) * erupt * 3.0 + erupt * R * 0.13;
+        nx += ddx * inv * rip;
+        ny += ddy * inv * rip;
+
+        fc = mCol + nx / aspect;
+        fr = mRow + ny;
+        fc += Math.sin(t * 0.021 + i * 0.7) * erupt * 1.5;
+        fr += Math.cos(t * 0.017 + i * 1.3) * erupt * 1.0;
+
         const tear = (((((fr | 0) * 374761393) ^ (tick * 668265263)) >>> 0) % 1000) / 1000;
-        if (tear > 0.80) fc += (tear - 0.9) * 90 * erupt;
+        if (tear > 0.86) fc += (tear - 0.93) * 55 * erupt;
       }
     }
 
@@ -324,15 +377,25 @@ function drawTitle(t) {
     if (tset[idx] && through >= tz[idx]) continue;
     tset[idx] = 1; tz[idx] = through;
 
-    if (erupt > 0.06) {
-      const h = (((i * 2654435761) ^ (tick * 40503)) >>> 0) % GLITCH.length;
-      chars[idx] = RAMP.length + h;            // a corrupted glyph
-      band[idx] = erupt > 0.45 ? GLITCH_HOT : GLITCH_BAND;
+    // Corruption is scattered, not solid: the chance a voxel turns into a
+    // glitch glyph climbs with the eruption, so bright junk erupts THROUGH
+    // the warped letters rather than replacing them.
+    const roll = ((((i * 2654435761) ^ (tick * 40503)) >>> 0) % 1000) / 1000;
+    // capped below 1 on purpose: even at the centre some voxels stay real
+    // glyphs, so the warped letters never fully disappear behind the junk
+    const pCorrupt = Math.min(0.72, (erupt - 0.20) / 0.42);
+
+    if (pCorrupt > 0 && roll < pCorrupt) {
+      const h = (((i * 40503) ^ (tick * 2654435761)) >>> 0) % GLITCH.length;
+      chars[idx] = RAMP.length + h;
+      band[idx] = erupt > 0.62 ? GLITCH_HOT : GLITCH_BAND;
     } else {
       const shade = 1 - through * 0.86;
       chars[idx] = 1 + Math.min(RAMP.length - 2, (shade * (RAMP.length - 1)) | 0);
       let b = through < 0.10 ? 3 : through < 0.36 ? 2 : through < 0.70 ? 1 : 0;
-      if (!isSoft && b > 0) b -= 1;            // VMESTE reads a step cooler
+      if (!isSoft && b > 0) b -= 1;            // VM reads a step cooler
+      // ghost the letters under the eruption — still legible, just receding
+      if (erupt > 0.05) b = Math.max(0, b - (erupt > 0.40 ? 2 : 1));
       band[idx] = b;
     }
   }
