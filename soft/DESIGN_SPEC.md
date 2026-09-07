@@ -250,14 +250,12 @@ character grid: the wordmark built as a 5×7 bitmap extruded into voxels and
 projected each frame, and the six tools as noise-distorted spheres shaded
 into the same grid, each in its own hue from the table in §2.
 
-The wordmark is set **`VMestesoft`** — caps on the V and M, lowercase for the
-rest, so it reads as the `vm` the Vmestenizer bolts onto every word, with the
-name trailing off it. Lowercase glyphs sit on the baseline at x-height; only
-`f` and `t` carry ascenders. It sets on one line above 900px and stacks to
-`VMeste` / `soft` below. Either way it is the same ten letters and letters 6–9
-are `soft`, which is what the brighter band keys off, so it reads the same in
-both layouts. (The document `<title>` and the `sr-only` `<h1>` stay
-**VmesteSoft** — this is a logotype's capitalisation, not the product's name.)
+The wordmark is set **`VmesteSoft`** — the product's own capitalisation, caps
+on the V and S. Lowercase glyphs sit on the baseline at x-height; only `f` and
+`t` carry ascenders, so the two caps stand clear of the run between them. It
+sets on one line above 900px and stacks to `Vmeste` / `Soft` below. Either way
+it is the same ten letters and letters 6–9 are `Soft`, which is what the
+brighter band keys off, so it reads the same in both layouts.
 
 **It is drawn, not set.** Every letter gets its own small tilt (±5°), baseline
 drift and size, and every voxel a little edge wobble. All of it is seeded by

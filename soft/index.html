@@ -146,10 +146,11 @@ const TOOLS = [
 
 /* ── 5×7 glyphs, only the letters the wordmark needs ── */
 const GLYPHS = {
-  // caps — the VM that every Vmestenized word wears
+  // caps — the two the name carries
   V: ['#...#', '#...#', '#...#', '#...#', '#...#', '.#.#.', '..#..'],
-  M: ['#...#', '##.##', '#.#.#', '#.#.#', '#...#', '#...#', '#...#'],
+  S: ['.####', '#....', '#....', '.###.', '....#', '....#', '####.'],
   // lowercase, sitting on the baseline; ascenders on f and t
+  m: ['.....', '.....', '#####', '#.#.#', '#.#.#', '#.#.#', '#.#.#'],
   e: ['.....', '.....', '.###.', '#...#', '#####', '#....', '.###.'],
   s: ['.....', '.....', '.####', '#....', '.###.', '....#', '####.'],
   o: ['.....', '.....', '.###.', '#...#', '#...#', '#...#', '.###.'],
@@ -159,8 +160,8 @@ const GLYPHS = {
 /* One line where it fits, two where it doesn't. Either way it is the same
    ten letters, and letters 6-9 are SOFT — which is what the brighter band
    keys off, so the wordmark reads identically in both layouts. */
-let LINES = ['VMestesoft'];
-const SOFT_AT = 6;                              // letters 6-9 are 'soft'
+let LINES = ['VmesteSoft'];
+const SOFT_AT = 6;                              // letters 6-9 are 'Soft'
 
 /* Stable hash — the hand-drawn wobble has to be the SAME every frame, or the
    letters boil. Seeded by letter and voxel, never by time. */
@@ -269,7 +270,7 @@ function layout() {
 
   fontPx = W < 620 ? 6 : W < 1000 ? 7 : 7;
   // one line needs ~68 cells of width to stay legible; below that it stacks
-  LINES = W < 900 ? ['VMeste', 'soft'] : ['VMestesoft'];
+  LINES = W < 900 ? ['Vmeste', 'Soft'] : ['VmesteSoft'];
 
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.font = '700 ' + fontPx + 'px "Space Mono", ui-monospace, monospace';
@@ -393,7 +394,7 @@ function drawTitle(t) {
       const shade = 1 - through * 0.86;
       chars[idx] = 1 + Math.min(RAMP.length - 2, (shade * (RAMP.length - 1)) | 0);
       let b = through < 0.10 ? 3 : through < 0.36 ? 2 : through < 0.70 ? 1 : 0;
-      if (!isSoft && b > 0) b -= 1;            // VM reads a step cooler
+      if (!isSoft && b > 0) b -= 1;            // Vmeste reads a step cooler
       // ghost the letters under the eruption — still legible, just receding
       if (erupt > 0.05) b = Math.max(0, b - (erupt > 0.40 ? 2 : 1));
       band[idx] = b;
