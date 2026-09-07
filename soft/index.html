@@ -90,6 +90,8 @@ body { background: var(--void); }
 
 const LABEL_PX = 26;   // room under each sphere for its name
 const RAMP = ' .:-=+*#%@';                     // 0 is empty
+const GLITCH = '/\\|<>[]{}!?$&#@%*';            // what the cursor corrupts it into
+const GLYPHSET = RAMP + GLITCH;                // chars[] indexes this
 
 /* The wordmark keeps the house accent. */
 const TITLE_BANDS = [
@@ -128,6 +130,11 @@ const ORB_BAND0 = TITLE_BANDS.length;
 const ORB_STEPS = 5;
 const BANDS = TITLE_BANDS.concat(...ORB_HUES.map(shadesOf));
 
+// the cursor eruption paints in its own two colours, over everything else
+const GLITCH_BAND = BANDS.length;
+const GLITCH_HOT  = BANDS.length + 1;
+BANDS.push('#C6FF3D', '#EAFFB0');
+
 const TOOLS = [
   { n: '01', label: 'Compress',   href: 'compressor/index.html'  },
   { n: '02', label: 'Format',     href: 'formatter/index.html'   },
@@ -147,7 +154,11 @@ const GLYPHS = {
   O: ['.###.', '#...#', '#...#', '#...#', '#...#', '#...#', '.###.'],
   F: ['#####', '#....', '#....', '####.', '#....', '#....', '#....']
 };
-const LINES = ['VMESTE', 'SOFT'];
+/* One line where it fits, two where it doesn't. Either way it is the same
+   ten letters, and letters 6-9 are SOFT — which is what the brighter band
+   keys off, so the wordmark reads identically in both layouts. */
+let LINES = ['VMESTESOFT'];
+const SOFT_AT = 6;
 
 const canvas = document.getElementById('scene');
 const ctx = canvas.getContext('2d', { alpha: false });
@@ -159,6 +170,19 @@ let chars, band, tz, tset;
 let voxels = null, voxCount = 0;
 let hovered = -1;
 
+/* Cursor eruption on the wordmark. The pointer is kept in cell coordinates
+   and its strength eased, so the effect arrives and leaves continuously
+   instead of snapping. Under reduced motion it never engages. */
+let mCol = -999, mRow = -999, mAmt = 0, mTarget = 0;
+addEventListener('pointermove', e => {
+  if (!charW) return;
+  mCol = e.clientX / charW;
+  mRow = e.clientY / charH;
+  mTarget = 1;
+}, { passive: true });
+addEventListener('pointerleave', () => { mTarget = 0; }, { passive: true });
+addEventListener('blur', () => { mTarget = 0; });
+
 /* ── build the extruded wordmark once; only projection runs per frame ── */
 const GAP = 7;                                  // per-letter advance, 5 wide + 2 clear
 function lineWidth(w) { return w.length * GAP - (GAP - 5); }
@@ -169,9 +193,10 @@ function buildVoxels(sub, deep) {
   const lineH = 7, lead = 9;                    // glyph height, line advance
   const blockH = LINES.length * lead - (lead - lineH);
 
+  let letter = 0;                               // index across the whole wordmark
   LINES.forEach((word, wi) => {
     const w = lineWidth(word);
-    for (let li = 0; li < word.length; li++) {
+    for (let li = 0; li < word.length; li++, letter++) {
       const g = GLYPHS[word[li]];
       for (let by = 0; by < lineH; by++) {
         for (let bx = 0; bx < 5; bx++) {
@@ -184,7 +209,7 @@ function buildVoxels(sub, deep) {
                 out.push(
                   px + sx / sub, py + sy / sub,
                   (z / (deep - 1) - 0.5) * (deep * 0.34),
-                  z / deep + wi                // depth through the letter (< 1), + line index
+                  z / deep + (letter >= SOFT_AT ? 1 : 0)   // depth (< 1), + SOFT flag
                 );
         }
       }
@@ -206,6 +231,8 @@ function layout() {
   canvas.style.height = H + 'px';
 
   fontPx = W < 620 ? 6 : W < 1000 ? 7 : 7;
+  // one line needs ~68 cells of width to stay legible; below that it stacks
+  LINES = W < 900 ? ['VMESTE', 'SOFT'] : ['VMESTESOFT'];
 
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.font = '700 ' + fontPx + 'px "Space Mono", ui-monospace, monospace';
@@ -243,6 +270,12 @@ function drawTitle(t) {
   const oy = rows * 0.18;
   const focal = 58;
 
+  const aspect = charW / charH;
+  const R = 7 + scale * 3.4;        // the hot zone scales with the wordmark
+  const tick = (t * 0.055) | 0;     // corrupted glyphs hold ~18x/sec, so it
+                                    // churns instead of fizzing white noise
+  const live = mAmt > 0.01;
+
   for (let i = 0; i < voxCount; i++) {
     const v = i * 4;
     const vx = voxels[v], vy = voxels[v + 1], vz = voxels[v + 2], vd = voxels[v + 3];
@@ -253,12 +286,37 @@ function drawTitle(t) {
     z = vy * sp + z * cp;
 
     const k = focal / (focal + z);
-    const col = (ox + x * scale * k) | 0;
-    const row = (oy + y * scale * k * 0.9) | 0;
+    let fc = ox + x * scale * k;
+    let fr = oy + y * scale * k * 0.9;
+
+    /* Blow the letters apart around the cursor: push each voxel radially out
+       of the hot zone, add per-voxel turbulence, and tear whole rows sideways.
+       A voxel that moves simply stops writing the cell it left, so the
+       wordmark opens into holes rather than smearing. */
+    let erupt = 0;
+    if (live) {
+      const ddx = (fc - mCol) * aspect, ddy = fr - mRow;
+      const dd = Math.hypot(ddx, ddy);
+      if (dd < R) {
+        const f = 1 - dd / R;
+        erupt = f * f * mAmt;
+        const inv = dd > 0.001 ? 1 / dd : 0;
+        const push = erupt * R * 0.55;
+        fc += (ddx * inv * push) / aspect;
+        fr += ddy * inv * push;
+        fc += Math.sin(t * 0.021 + i * 0.7) * erupt * 2.6;
+        fr += Math.cos(t * 0.017 + i * 1.3) * erupt * 1.6;
+        const tear = (((((fr | 0) * 374761393) ^ (tick * 668265263)) >>> 0) % 1000) / 1000;
+        if (tear > 0.80) fc += (tear - 0.9) * 90 * erupt;
+      }
+    }
+
+    const col = fc | 0;
+    const row = fr | 0;
     if (col < 0 || col >= cols || row < 0 || row >= rows) continue;
 
     const through = vd % 1;                    // 0 at the face, 1 at the back
-    const isSoft = vd >= 1;                    // the tagged second line
+    const isSoft = vd >= 1;                    // the SOFT half of the wordmark
 
     const idx = row * cols + col;
     // shallowest-through wins: the face stays solid under any rotation, and
@@ -266,11 +324,17 @@ function drawTitle(t) {
     if (tset[idx] && through >= tz[idx]) continue;
     tset[idx] = 1; tz[idx] = through;
 
-    const shade = 1 - through * 0.86;
-    chars[idx] = 1 + Math.min(RAMP.length - 2, (shade * (RAMP.length - 1)) | 0);
-    let b = through < 0.10 ? 3 : through < 0.36 ? 2 : through < 0.70 ? 1 : 0;
-    if (!isSoft && b > 0) b -= 1;               // VMESTE reads a step cooler
-    band[idx] = b;
+    if (erupt > 0.06) {
+      const h = (((i * 2654435761) ^ (tick * 40503)) >>> 0) % GLITCH.length;
+      chars[idx] = RAMP.length + h;            // a corrupted glyph
+      band[idx] = erupt > 0.45 ? GLITCH_HOT : GLITCH_BAND;
+    } else {
+      const shade = 1 - through * 0.86;
+      chars[idx] = 1 + Math.min(RAMP.length - 2, (shade * (RAMP.length - 1)) | 0);
+      let b = through < 0.10 ? 3 : through < 0.36 ? 2 : through < 0.70 ? 1 : 0;
+      if (!isSoft && b > 0) b -= 1;            // VMESTE reads a step cooler
+      band[idx] = b;
+    }
   }
   tset.fill(0);
 }
@@ -438,7 +502,7 @@ function paint() {
       rowBuf.length = 0;
       for (let col = 0; col < cols; col++) {
         const c = chars[base + col];
-        rowBuf.push(c && band[base + col] === b ? RAMP[c] : ' ');
+        rowBuf.push(c && band[base + col] === b ? GLYPHSET[c] : ' ');
       }
       ctx.fillStyle = BANDS[b];
       ctx.fillText(rowBuf.join(''), 0, row * charH);
@@ -447,6 +511,7 @@ function paint() {
 }
 
 function frame(t) {
+  mAmt += (mTarget - mAmt) * 0.18;             // ease in and out, never snap
   chars.fill(0); band.fill(0);
   placeOrbs(t);
   drawTitle(t);

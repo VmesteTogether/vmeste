@@ -248,7 +248,22 @@ No noise, no grain, no CRT curvature, no chromatic aberration.
 The index is not a tool and does not sit in a row of tools. It is a single
 character grid: the wordmark built as a 5×7 bitmap extruded into voxels and
 projected each frame, and the six tools as noise-distorted spheres shaded
-into the same grid, each in its own hue from the table in §2. Every sphere
+into the same grid, each in its own hue from the table in §2.
+
+The wordmark sets on **one line above 900px and stacks to VMESTE / SOFT below
+it** — one line needs roughly 68 cells of width before the letters stop being
+legible against their own extrusion. Either way it is the same ten letters and
+letters 6–9 are SOFT, which is what the brighter band keys off, so the
+wordmark reads the same in both layouts.
+
+**The cursor erupts it.** Within a radius that scales with the wordmark, each
+voxel is pushed radially out of the hot zone, jittered per-voxel, and some
+rows tear sideways; the glyphs there corrupt into `/\|<>[]{}!?$&#@%*` held at
+~18 changes/sec so it churns rather than fizzing into white noise, and
+recolours to lime and a hot tint. Voxels that move stop writing the cell they
+left, so the wordmark opens into holes instead of smearing. Strength is eased
+in and out, so it follows the pointer continuously and decays to nothing when
+it leaves. Under `prefers-reduced-motion` it never engages. Every sphere
 has a real `<a>` carrying its name positioned over it, so the page is
 clickable, tabbable and readable without seeing the art at all. No numbers
 on the labels — the name is the label, and the tools are not a sequence you
